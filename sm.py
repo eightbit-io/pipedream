@@ -64,6 +64,8 @@ class socketMessage:
       woof += "P "
     if self.mandatory is True:
       woof += "M "
+    if self.disconnect is True:
+      woof += "D "
     if d == socketConversation.DIRECTION_FORWARD:
       print " [ %d -> len:0x%04x ]" % (i,len(message)),
     else:

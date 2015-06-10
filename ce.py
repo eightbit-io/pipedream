@@ -90,15 +90,20 @@ class conversationEditor:
     if interactive:
       self.editShell()
 
-  def printConversation(self):
+  def printConversation(self,start=None,end=None):
     if self.sequence is None:
       print "[err: sequence not loaded]"
       return
     else:
-      for i in range(0,len(self.sequence.messages)):
-        self.sequence.messages[i].prettyPrintShort(i)
-        #(d,m) = self.sequence.fetchMessage(i)
-        #prettyPrintShort(i,d,m)
+      if start is None or end is None:
+        for i in range(0,20):
+          self.sequence.messages[i].prettyPrintShort(i)
+          #(d,m) = self.sequence.fetchMessage(i)
+          #prettyPrintShort(i,d,m)
+      else:
+        for i in range(start,end):
+          self.sequence.messages[i].prettyPrintShort(i)
+      print " [total: %d]" % len(self.sequence.messages)
 
   def editPacketHelp(self):
     print " q: quit, without save"
@@ -200,13 +205,18 @@ class conversationEditor:
       elif c in ("p","print"):
         if len(commandTokens) == 1:
           if self.selectToken is None:
-            self.printConversation()
+            self.printConversation(0,20)
           else:
-            (d,m) = self.sequence.fetchMessage(self.selectToken)
-            prettyPrint(self.selectToken,d,m)
+            start = self.selectToken - 10
+            if start < 0: start = 0
+            end = self.selectToken + 10
+            if end > len(self.sequence.messages) : end = len(self.sequence.messages)
+            self.printConversation(start,end)
+            #(d,m) = self.sequence.fetchMessage(self.selectToken)
+            #prettyPrint(self.selectToken,d,m)
         elif len(commandTokens) == 2:
           if commandTokens[1] in ("a","all"):
-            self.printConversation()
+            self.printConversation(0,len(self.sequence.messages))
           else:
             i = int(commandTokens[1])
             try:

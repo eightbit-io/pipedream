@@ -14,6 +14,7 @@ from rs import *
 from rc import *
 from cs import *
 from ce import *
+from px import *
 
 def usage():
   print "-----------------------------------------"
@@ -22,6 +23,7 @@ def usage():
   print " -i host:port : listening socket"
   print " -o host:port : output socket"
   print " -m [capture|replay|edit] : select mode"
+  print " -m [proxy] : raw traffic editor mode"
   print " -f filename : load or save to file"
   print " -c [mut%] : % of mutation"
   print " -s : use ssl"
@@ -68,6 +70,8 @@ def main():
     replayclient(outHost,file,sslRequired,mutChance)
   elif mode == "replayserver" and inHost is not None and file is not None:
     replayserver(inHost,file,sslRequired,mutChance)
+  elif mode == "proxy" and inHost is not None and outHost is not None and file is not None:
+    proxy(inHost,outHost,file,sslRequired)
   elif mode == "edit":
     e = conversationEditor(file)
   else:
