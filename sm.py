@@ -21,6 +21,7 @@ class socketMessage:
   def __init__(self,d,m):
     self.direction = d
     self.message = m
+    self.disconnect = False
     self.py = None
     d = bytearray(m)
     # credit stack-overflow for building the dictionary
@@ -42,6 +43,12 @@ class socketMessage:
 
   def setMandatory(self,i):
     self.mandatory = i
+
+  def setDisconnect(self,i):
+    self.disconnect = i
+
+  def getDisconnect(self):
+    return self.disconnect
 
   def getMandatory(self):
     return self.mandatory

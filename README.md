@@ -33,7 +33,7 @@ can be accessed via:
 
     pipedream.py -m edit -f google-12345.cnv
 
-## practical example (fuzzing a browser)
+## practical example (fuzzing a browser) [REMOVED DUE TO CHANGING FORMAT]
 The first step is to capture a browser's request / response pair, as follows:
 
     python pipedream.py -m capture -i localhost:4040 -o www.blah.com:80 -f creche

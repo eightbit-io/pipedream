@@ -36,19 +36,28 @@ class replayServer:
       thread.start_new_thread(self.replay_handler,(clientsocket,address))
 
   def replay_handler(self,clientsock,address):
-    # if the first message is a server message...
-    if self.socketConv.messages[0].mandatory is True and self.socketconv.messages[i].direction == socketMessage.DIRECTION_BACK:
-      if random.randint(0,100) <= self.mutChance:
-        clientsock.sendall(self.socketConv.fetchMutated(0))
-      else:
-        clientsock.sendall(self.socketConv.messages[0].message)
+    # sending initial burst of traffic.
+    for i in range(0,len(self.socketConv.messages)):
+      try:
+        if self.socketConv.messages[i].mandatory is True and self.socketConv.messages[i].direction == socketMessage.DIRECTION_BACK:
+          if random.randint(0,100) <= self.mutChance:
+            clientsock.sendall(self.socketConv.fetchMutated(0))
+          else:
+            clientsock.sendall(self.socketConv.messages[i].message)
+        if self.socketConv.messages[i].disconnect is True:
+          clientsock.close()
+          return
+      except socket.error, e:
+        if e.errno == 10054 or e.errno == 10053:
+          print "[client disconnected]"
+          return
     clientsock.settimeout(3)
     while True:
       try:
         data = clientsock.recv(10240)
         if not data: break
       except socket.error, e:
-        if e.errno == 10054:
+        if e.errno == 10054 or e.errno == 10053:
           print "[client disconnected]"
           return
       except socket.timeout:
