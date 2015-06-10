@@ -35,18 +35,26 @@ def pullFile(inputserver, mask, count):
     newFileName = mask % i
     f = open(newFileName,"wb")
     continueFlag = True
-    while continueFlag:
-      try:
-        d = forwardSocket.recv() 
-        f.write(d)
-      except:
-        continueFlag = False
+    forwardSocket.settimeout(1)
+    while continueFlag is True:
+      d = forwardSocket.recv(1024)
+      if not d: break
+      f.write(d)
     print "[close]"
     f.close()
 
 def usage():
-  print "m [push/pull]: convert a file to a conv or vice versa"
-  print "f [filename] : specify a filename / input server to use"
+  print "---------------------------------------------------------------"
+  print " -m [push/pull]: convert a file to a conv or vice versa"
+  print " -f [filename] : specify a filename / input server to use"
+  print " -i [input serve] : specify which port to pull files from"
+  print " -o [mask] : specify how to save files"
+  print " -c [count] : specify how many files to pull (default 100)"
+  print "---------------------------------------------------------------"
+  print " examples:"
+  print " -m push -f happymeal.png"
+  print " -m pull -i localhost:4040 -o bucket/fuzz-%d.png -c 100"
+  print "---------------------------------------------------------------"
   return
 
 if __name__ == "__main__":

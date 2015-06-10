@@ -45,6 +45,7 @@ class replayServer:
           else:
             clientsock.sendall(self.socketConv.messages[i].message)
         if self.socketConv.messages[i].disconnect is True:
+          print "[force disconnected]"
           clientsock.close()
           return
       except socket.error, e:
