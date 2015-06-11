@@ -206,7 +206,10 @@ class conversationEditor:
       elif c in ("p","print"):
         if len(commandTokens) == 1:
           if self.selectToken is None:
-            self.printConversation(0,20)
+            if len(self.sequence.messages) >= 20:
+              self.printConversation(0,20)
+            else:
+              self.printConversation(0,len(self.sequence.messages))
           else:
             start = self.selectToken - 10
             if start < 0: start = 0

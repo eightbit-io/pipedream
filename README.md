@@ -42,3 +42,17 @@ This fuzzer also includes a editor, which can modify conversation files. This
 can be accessed via:
 
     pipedream.py -m edit -f google-12345.cnv
+
+Inline help is provided (somewhat).
+
+## example (fuzzing a web browser)
+This fuzzer can be easily used to fuzz a web browser. The first step is to
+capture traffic to the target web server, by using pipedream in the default
+proxy mode:
+
+    pipedream.py -m capture -f graceful2 -i localhost:4040 -o www.reddit.com:80
+
+This will create a socket conversation file, with the extension of .cnv A 
+previously prepared sample file is in the samples directory. This will 
+
+## WIP WIP
