@@ -31,7 +31,7 @@ class replayClient:
       (d,m) = self.socketConv.fetchMessage(i)
       if d == socketConversation.DIRECTION_FORWARD:
         a = random.randint(0,100)
-        if a <= self.mutChance:
+        if a <= self.mutChance and self.socketConv.messages[i].getStatic() is False:
           forwardSocket.sendall(self.socketConv.fetchMutated(i))
         else:
           forwardSocket.sendall(m)

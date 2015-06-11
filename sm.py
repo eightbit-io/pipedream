@@ -37,6 +37,7 @@ class socketMessage:
     self.bindings = []
     self.py = None
     self.mandatory = False
+    self.static = False
 
   def swallow(self,data):
     self.message += data
@@ -52,6 +53,12 @@ class socketMessage:
 
   def getMandatory(self):
     return self.mandatory
+
+  def setStatic(self,i):
+    self.static = i
+
+  def getStatic(self):
+    return self.static
 
   def prettyPrintShort(self,i):
     d = self.direction

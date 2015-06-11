@@ -182,6 +182,7 @@ class conversationEditor:
     print " set python [file?]: bind python mutation code to packet"
     print " set python None: remove python mutation code from packet"
     print " set mandatory [yes/no]: do we have to send a given packet"
+    print " set static [yes/no]: can we modify a given packet"
     print " set disconnect [yes/no]: do we need to disconnect after sending this packet (emulating server only)"
     print " swallow [packet]: append given packet's data to current selection"
     print " bind [regexp]: bind words to server responses"
@@ -321,5 +322,10 @@ class conversationEditor:
             self.sequence.messages[self.selectToken].setDisconnect(True)
           elif commandTokens[2] == "no":
             self.sequence.messages[self.selectToken].setDisconnect(False)
+        elif commandTokens[1] == "static" and len(commandTokens) == 3:
+          if commandTokens[2] == "yes":
+            self.sequence.messages[self.selectToken].setStatic(True)
+          elif commandTokens[2] == "no":
+            self.sequence.messages[self.selectToken].setStatic(False)
       elif c in ("h","help"):
         self.help()

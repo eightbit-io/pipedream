@@ -40,7 +40,7 @@ class replayServer:
     for i in range(0,len(self.socketConv.messages)):
       try:
         if self.socketConv.messages[i].mandatory is True and self.socketConv.messages[i].direction == socketMessage.DIRECTION_BACK:
-          if random.randint(0,100) <= self.mutChance:
+          if random.randint(0,100) <= self.mutChance and self.socketConv.messages[0].getStatic() is False:
             clientsock.sendall(self.socketConv.fetchMutated(0))
           else:
             clientsock.sendall(self.socketConv.messages[i].message)
@@ -72,7 +72,7 @@ class replayServer:
       try:
         for m in range(0,len(self.socketConv.messages)):
           if self.socketConv.messages[m].checkBind(data):
-            if random.randint(0,100) <= self.mutChance:
+            if random.randint(0,100) <= self.mutChance and self.socketConv.messages[m].getStatic() is False:
               clientsock.sendall(self.socketConv.fetchMutated(m))
             else:
               clientsock.sendall(self.socketConv.messages[m].message)
