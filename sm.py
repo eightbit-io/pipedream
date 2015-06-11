@@ -9,7 +9,7 @@ import string
 # to know that the path is infinite
 # or to walk that path alone?
 
-VERSION="I AM SUN OF HOUSE ARISUN - AND I AM INVINCIBLE"
+VERSION="test1"
 
 class socketMessage:
   DIRECTION_FORWARD = 1
