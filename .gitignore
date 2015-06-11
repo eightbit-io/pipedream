@@ -58,3 +58,9 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# cleanup brace
+utils/*.obj
+utils/*.pdb
+utils/*.bat
+utils/*.ilk
