@@ -52,7 +52,59 @@ proxy mode:
 
     pipedream.py -m capture -f graceful2 -i localhost:4040 -o www.reddit.com:80
 
-This will create a socket conversation file, with the extension of .cnv A 
-previously prepared sample file is in the samples directory. This will 
+This will create a socket conversation file, with the extension of .cnv. A
+sample is in samples/graceful2-37659.cn_. Open this file in edit mode, as
+follows:
 
-## WIP WIP
+    pipedream.py -m edit -f graceful2.cnv
+
+Using the "p" command, inspect the contents of this conversation: note there
+are six total requests, corresponding to three HTTP requests, as follows:
+
+    [####] : p
+    [ 0 -> len:0x015e ]  [ 47 45 54 20 2f 20 48 54  GET / HT ]
+    [ 1 <- len:0x06ee ]  [ 48 54 54 50 2f 31 2e 31  HTTP/1.1 ]
+    [ 2 -> len:0x0163 ]  [ 47 45 54 20 2f 63 64 6e  GET /cdn ]
+    [ 3 <- len:0x0550 ]  [ 48 54 54 50 2f 31 2e 31  HTTP/1.1 ]
+    [ 4 <- len:0x1018 ]  [ 95 1c 5c 5b 3b ff ad b5  ..\[;... ]
+    [ 5 -> len:0x017a ]  [ 47 45 54 20 2f 63 64 6e  GET /cdn ]
+    [ 6 <- len:0x0550 ]  [ 48 54 54 50 2f 31 2e 31  HTTP/1.1 ]
+
+The first step is to merge packet 4 into packet 3, such that the HTTP response
+is in a single piece. Do this by selecting packet 3 with "s", then using the
+swallow command to merge it with packet 4:
+
+    [####] : s 3
+    [   3] : swallow 4
+    [   3] : s none
+    [####] : p
+    [ 0 -> len:0x015e ]  [ 47 45 54 20 2f 20 48 54  GET / HT ]
+    [ 1 <- len:0x06ee ]  [ 48 54 54 50 2f 31 2e 31  HTTP/1.1 ]
+    [ 2 -> len:0x0163 ]  [ 47 45 54 20 2f 63 64 6e  GET /cdn ]
+    [ 3 <- len:0x1568 ]  [ 48 54 54 50 2f 31 2e 31  HTTP/1.1 ]
+    [ 4 -> len:0x017a ]  [ 47 45 54 20 2f 63 64 6e  GET /cdn ]
+    [ 5 <- len:0x0550 ]  [ 48 54 54 50 2f 31 2e 31  HTTP/1.1 ]
+    [total: 6]
+    [####] :
+
+Now, we will fuzz the browser by using pipedream to emulate a server. We need
+to configure pipedream to respond to an HTTP GET request with the first HTTP
+response. Use the "s" command to selec the first response, then use the "bind"
+command to link this response with the "GET" verb:
+
+    s 1
+    bind .*GET.*
+    s none
+
+Now, save the file:
+
+    save graceful2p1.cnv
+
+Now, exit the program, and restart it in replay server mode:
+
+    pipedream.py -m replayserver -i localhost:4040 -c 100 -f graceful2p1.cnv
+
+Using a browser or a TCP socket tool, connect to port 4040 on localhost. If you
+use an HTTP browser, you may notice that a successful render does not return what
+you expect: this is because reddit's web server does not like connections with a
+Host header of "localhost".
