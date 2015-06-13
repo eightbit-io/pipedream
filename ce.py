@@ -168,27 +168,21 @@ class conversationEditor:
         tempM[selectedRow * 8 + selectedColumn] = chr( int(commandTokens[1],16) )
         m = str(tempM)
 
-  def help(self):
-    print " q: quit"
-    print " p [all | num] : print sequence / packet"
-    print " l [file]: load from file"
-    print " h: print help message"
-    print " s [num] : select a message"
-    print " f: flip selected packet"
-    print " d: delete selected packet"
-    print " e: edit selected packet"
-    print " x [file]: export packet to file"
-    print " i [file]: import packet from file"
-    print " set python [file?]: bind python mutation code to packet"
-    print " set python None: remove python mutation code from packet"
-    print " set mandatory [yes/no]: do we have to send a given packet"
-    print " set static [yes/no]: can we modify a given packet"
-    print " set disconnect [yes/no]: do we need to disconnect after sending this packet (emulating server only)"
-    print " swallow [packet]: append given packet's data to current selection"
-    print " bind [regexp]: bind words to server responses"
-    print " save: [file?] save sequence to file (or current file)"
-    print " -: move current selection backward"
-    print " +: move current selection forward"
+  def help(self,command=None):
+    global ceCommands
+    if command is None:
+      print " commands available:",
+      cLen = 0
+      for c in ceCommands.keys():
+        print "%s," % c,
+        cLen += len(c) + 2
+        if cLen > 30:
+          print ""
+          print " " * len(" commands available:"),
+          cLen = 0
+      print ""
+    else:
+      print "%s" % ceCommands[command]
 
   def editShell(self):
     continueFlag = True
@@ -200,6 +194,13 @@ class conversationEditor:
       else:
         q = raw_input(" [%4d] : " % self.selectToken).rstrip().lstrip()
       commandTokens = q.split(" ")
+      if len(commandTokens) > 1:
+        try:
+          sNum = int(commandTokens[0])
+          self.selectToken = sNum
+          commandTokens.pop(0)
+        except:
+          pass
       c = commandTokens[0]
       if c in ("q","quit"):
         continueFlag = False
@@ -331,4 +332,25 @@ class conversationEditor:
           elif commandTokens[2] == "no":
             self.sequence.messages[self.selectToken].setStatic(False)
       elif c in ("h","help"):
-        self.help()
+        if len(commandTokens) >= 2:
+          self.help(commandTokens[1])
+        else:
+          self.help()
+
+ceCommands = {}
+ceCommands["q"] = " q : quit pipedream"
+ceCommands["p"] = " p [all | num] : print whole sequence or selected message"
+ceCommands["l"] = " l [file] : load sequence from file"
+ceCommands["h"] = " h [command] : list commands, or display help for a given command"
+ceCommands["s"] = " s [num | none] : select a given packet, or clear selection"
+ceCommands["f"] = " f : flip direction of message"
+ceCommands["d"] = " d : delete the currently selected packet"
+ceCommands["e"] = " e : edit the currently selected packet"
+ceCommands["x"] = " x [file] : export the currently selected packet to a file"
+ceCommands["i"] = " i [file] : replace the currently selected packet with data from a file"
+ceCommands["set"] = " set [python | mandatory | static] [yes | no] : set attributes of currently selected packet"
+ceCommands["swallow"] = " swallow [num] : attach the target packet to the currently selected packet"
+ceCommands["bind"] = " bind [regex] : assign a regular expression to a packet: when pipedream in replay mode receives data matching a regex, it plays the selected packet"
+ceCommands["save"] = " save [filename] : save the current conversation to a file"
+ceCommands["+"] = " + : move a packet forward by one position"
+ceCommands["-"] = " - : move a packet backward by one position"

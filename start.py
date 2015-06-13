@@ -2,6 +2,7 @@
 
 import sys
 import os
+from sm import *
 
 def push(a):
   filename = a["file"]
@@ -46,8 +47,8 @@ if __name__ == "__main__":
   a = {}
   b = {}
   b["push"] = (["file"],"push(a)","convert a file to a .cnv which can be directly used in a pull command")
-  b["pull"] = (["input","extension","count"],"pull(a)","pull #count files from input server, saving to bucket/*.extension")
-  b["q"] = ([],"sys.exit(0)")
+  b["pull"] = (["input","ext","count"],"pull(a)","pull #count files from input server, saving to bucket/*.extension")
+  b["q"] = ([],"sys.exit(0)","exit the program")
   while continueFlag:
     c = raw_input(" > ").rstrip().lstrip()
     commandTokens = c.split(" ")
