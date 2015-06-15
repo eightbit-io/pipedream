@@ -3,6 +3,11 @@
 import sys
 import os
 from sm import *
+from rs import *
+from rc import *
+from cs import *
+from ce import *
+from px import *
 
 def push(a):
   filename = a["file"]
@@ -42,13 +47,90 @@ def pull(a):
     f.close()
   return
 
+def usage(b):
+  for keyword in b.keys():
+    (params,command,helptext) = b[keyword]
+    if helptext is None:
+      continue
+    if len(params) == 0:
+      print " %s [] %s" % (keyword,helptext)
+    else:
+      print " %s [requires:" % keyword,
+      for p in params:
+        print "%s" % p,
+      print "] %s" % helptext
+
+def proxy_capture(a):
+  inHost = a["in"]
+  outHost = a["out"]
+  file = a["file"]
+  sslRequired = False
+  if a["ssl"] in ["y","yes","true"]:
+    sslRequired = True
+  capture(inHost,outHost,file,sslRequired)
+
+def proxy_replayclient(a):
+  outHost = a["out"]
+  file = a["file"]
+  sslRequired = False
+  if a["ssl"] in ["y","yes","true"]:
+    sslRequired = True
+  mutChance = int(a["chance"])
+  replayclient(outHost,file,sslRequired,mutChance)
+
+def proxy_replayserver(a):
+  inHost = a["in"]
+  file = a["file"]
+  sslRequired = False
+  if a["ssl"] in ["y","yes","true"]:
+    sslRequired = True
+  mutChance = int(a["chance"])
+  replayserver(inHost,file,sslRequired,mutChance)
+
+def proxy_proxy(a):
+  inHost = a["in"]
+  outHost = a["out"]
+  sslRequired = False
+  if a["ssl"] in ["y","yes","true"]:
+    sslRequired = True
+  file = int(a["tamper"])
+  replayserver(inHost,file,sslRequired,mutChance)
+
+def proxy_editor(a):
+  file = a["file"]
+  e = conversationEditor(file)
+
+def listCommands(a):
+  print "-" * 64
+  print " ",
+  horizontalLength = 2
+  for k in a.keys():
+    if horizontalLength + len(k) + 2 > 64:
+      print ""
+      print " ",
+      horizontalLength = 2
+    print "%s" % k,
+    horizontalLength += len(k) + 1
+  print ""
+  print "-" * 64
+
 if __name__ == "__main__":
   continueFlag = True
   a = {}
   b = {}
   b["push"] = (["file"],"push(a)","convert a file to a .cnv which can be directly used in a pull command")
   b["pull"] = (["input","ext","count"],"pull(a)","pull #count files from input server, saving to bucket/*.extension")
-  b["q"] = ([],"sys.exit(0)","exit the program")
+  b["q"] = ([],"sys.exit(0)",None)
+  b["quit"] = ([],"sys.exit(0)","exit the program")
+  b["help"] = ([],"usage(b)","display a help message")
+  b["h"] = ([],"usage(b)",None)
+  b["capture"] = (["in","out","file","ssl"],"proxy_capture(a)","capture traffic from in -> out, saving to file. ssl is [true|false]")
+  b["replay"] = (["out","file","ssl","chance"],"proxy_replayclient(a)","replay a client, connecting to out. ssl is [true|false]")
+  b["replayserver"] = (["in","file","ssl","chance"],"proxy_replayserver(a)","replay a server, listening on in. ssl is [true|false]")
+  b["proxy"] = (["in","tamper","ssl","out"],"proxy_proxy(a)","pretend to be a proxy server, tampering data with the tamper script")
+  b["edit"] = (["file"],"proxy_editor(a)","edit the conversation in [file]")
+  b["ls"] = ([],"listCommands(b)","list commands")
+  listCommands(b)
   while continueFlag:
     c = raw_input(" > ").rstrip().lstrip()
     commandTokens = c.split(" ")
